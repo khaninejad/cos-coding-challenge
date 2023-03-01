@@ -1,5 +1,5 @@
 import { injectable } from "inversify";
-import { AuctionItem } from "../dtos/auction/auction-item";
+import { AuctionItem } from "../dtos/auction/AuctionItem";
 
 @injectable()
 export class Calculator {
