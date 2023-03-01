@@ -133,6 +133,18 @@ describe('AuctionMonitorApp', () => {
       } 
 
     });
+
+    it('should throw error on null but valid call', async () => {
+  
+      axiosInstanceStub.get.resolves(null);
+
+      try {
+        await actionMonitor.getRunningAuctions('token', actionFilter, false);
+      } catch (error:any) {
+        expect(error.message).to.equal('invalid input');
+      } 
+
+    });
   });
 
   describe('start', () => {
@@ -154,21 +166,6 @@ describe('AuctionMonitorApp', () => {
 
     }); 
 
-    // it('prepare auction data should be called', async () => {
-    //   axiosInstanceStub.put.resolves({data: validAuthResponse});
-
-    //   axiosInstanceStub.get.resolves({data: {items: [], page: 1, total: 3}});
-      
-      
-    //   const auctionDataStub = sinon.stub(actionMonitor, 'getRunningAuctions');
-
-    //   const result = await actionMonitor.prepareAuctionData(10, 'token', 5);
-    
-    //   expect(result.length).to.equal(10);
-    
-    //   auctionDataStub.restore();
-
-    // }); 
   });
 
 });
