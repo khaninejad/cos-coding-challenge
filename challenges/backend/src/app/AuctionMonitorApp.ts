@@ -25,47 +25,39 @@ export class AuctionMonitorApp implements ICarOnSaleClient {
     public async start(): Promise<void> {
         this.logger.log(`Auction Monitor started.`);
         const { token } = await this.userAuthentication();
-        const active_actions = await this.getRunningAuctions(token, { limit: 0, offset: 0 }, true);
-        this.checkActiveAuction(active_actions);
+        const active_auctions = await this.getRunningAuctions(token, { limit: 0, offset: 0 }, true);
+        this.checkActiveAuction(active_auctions);
 
         const page_limit = parseInt(this.config.get('page_limit'));
-        const numPages = Math.ceil(active_actions.total / page_limit);
+        const numPages = Math.ceil(active_auctions.total / page_limit);
 
-        const responses: AuctionItem[] = await this.prepareAuctionData(numPages, token, page_limit);
+        const auctionResponses: AuctionItem[] = await this.prepareAuctionData(numPages, token, page_limit);
 
-        this.printNumberOfAuctions(responses);
-        this.printAverageBids(responses);
-        this.printAveragePercentage(responses);
+        this.printNumberOfAuctions(auctionResponses);
+        this.printAverageBids(auctionResponses);
+        this.printAveragePercentage(auctionResponses);
     }
-    printNumberOfAuctions(auctions: AuctionItem[]): void {
+    private printNumberOfAuctions(auctions: AuctionItem[]): void {
         this.logger.log(`Number of Auctions: ${auctions.length}`);
     }
 
-    printAveragePercentage(auctions: AuctionItem[]) {
+    private printAveragePercentage(auctions: AuctionItem[]):void {
         const averageProgress = this.calculator.calculateAverageProgress(auctions);
         this.logger.log(`Average auction progress: ${averageProgress.toFixed(2)}%`);
     }
-    printAverageBids(auctions: AuctionItem[]) {
+    private printAverageBids(auctions: AuctionItem[]):void {
         const averageBids = this.calculator.calculateAverageBids(auctions);
         this.logger.log(`Average average bid: ${averageBids}`);
     }
-    async prepareAuctionData(numPages: number, token: string, page_limit: number): Promise<AuctionItem[]> {
-        const requests = [];
-        const items = new Set<AuctionItem>();
-        for (let i = 1; i <= numPages; i++) {
-            requests.push(this.getRunningAuctions(token, { limit: page_limit, offset: i * page_limit }, false));
-        }
+    private async prepareAuctionData(numPages: number, token: string, page_limit: number): Promise<AuctionItem[]> {
+        const requests = Array.from({ length: numPages }, (_, i) => this.getRunningAuctions(token, { limit: page_limit, offset: i * page_limit }, false));
 
         const responses: Auction[] = await Promise.all(requests);
-        for (const response of responses) {
-            for (const item of response.items) {
-                items.add(item);
-            }
-        }
-        return Array.from(items);
+        const items: AuctionItem[] = responses.flatMap(response => response.items);
+        return Array.from(new Set(items));
     }
 
-    private checkActiveAuction(active_actions: Auction) {
+    private checkActiveAuction(active_actions: Auction):void {
         if (active_actions.total < 0) {
             this.logger.log(`No active auction`);
             process.exit(0);
