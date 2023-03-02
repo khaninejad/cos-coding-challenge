@@ -9,4 +9,5 @@ export interface ICarOnSaleClient {
 
     getRunningAuctions(token: string, filter: IActionFilter, count: boolean): Promise<Auction>
     userAuthentication(): Promise<AuthenticationResponse>
+    print(): Promise<void>
 }
