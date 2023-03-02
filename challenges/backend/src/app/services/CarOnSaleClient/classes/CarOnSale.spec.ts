@@ -47,12 +47,6 @@ describe('CarOnSale', () => {
     carOnSale = new CarOnSale(logger, axiosInstanceStub, config, calculator);
   });
 
-  describe('#start', () => {
-    it('should log a message when started', async () => {
-      expect(true).to.true;
-    });
-  });
-
   describe('userAuthentication', () => {
     it('should authenticate a user', async () => {
       const email = 'test@test.com';

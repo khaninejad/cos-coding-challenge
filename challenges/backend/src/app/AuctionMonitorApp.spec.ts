@@ -36,12 +36,6 @@ describe('AuctionMonitorApp', () => {
     actionMonitor = new AuctionMonitorApp(logger, carOnSale);
   });
 
-  describe('#start', () => {
-    it('should log a message when started', async () => {
-      expect(true).to.true;
-    });
-  });
-
   describe('start', () => {
     it('should call print', async () => {
 
